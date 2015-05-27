@@ -85,6 +85,8 @@ class MemcachedCollector(diamond.collector.Collector):
             else:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sock.connect((host, int(port)))
+
+            sock.settimeout(2.)
             # request stats
             sock.send('stats\n')
             # something big enough to get whatever is sent back
@@ -92,6 +94,9 @@ class MemcachedCollector(diamond.collector.Collector):
         except socket.error:
             self.log.exception('Failed to get stats from %s:%s',
                                host, port)
+        finally:
+            sock.close()
+
         return data
 
     def get_stats(self, host, port):
